@@ -18,10 +18,21 @@ class DbObjectView extends React.Component {
     }
 
     getFBObject() {
+
+        /*
+        Goal: Transform the object into something easily manipulated that can be reformed to DB later
+        dbObject header will always be the same, but properties will be customized to the 
+        formField to which it belongs.
+
+        Break getFBObject into getFBObject, createClientObject, createDBObject for reformation,
+        and postDBObject
+        */
+
         const dbObject = {
             uniqueID: "",
             description: "",
-            properties: []
+            wModelClass: "",
+            properties: {}
         };
 
         console.log("GetFBObject");
@@ -37,18 +48,33 @@ class DbObjectView extends React.Component {
 
             dbref.child("properties").once('value', function(snapshot) {
                 snapshot.forEach(function(childSnapshot) {
+                    if(childSnapshot.key() === wmodel_class) {
+                        dbObject.wModelClass = childSnapshot.val()[2];
+                    } else {
+                        
+                        var propertyName = childSnapshot.val()[0];
+                        var formFieldType = childSnapshot.val()[1];
+                        var displayText = childSnapshot.val()[2];
+                        var selectedValue = childSnapshot.val()[3];
+                    }
+
                     console.log(childSnapshot.val().length);
                     console.log(childSnapshot.val()[0]);
+
+                    
+
+                    /*
+                        public final static int PROPERTY_NAME = 0;
+    public final static int FORM_FIELD_TYPE = 1;
+    public final static int DISPLAY_TEXT = 2;
+    public final static int SELECTED_VALUE = 3;
+    public final static int CANCEL_BUTTON = 3;
+    public final static int SAVE_BUTTON = 4;
+    public final static int SUBMIT_BUTTON = 5;
+                    */
+
                 });
             });
-            /*
-            for(var property in snapshot.val().properties) {
-                for(var child in property) {
-                    console.log(child.val());
-                }
-            }
-            */
-             
         });
     }
 
