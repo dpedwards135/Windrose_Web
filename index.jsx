@@ -1,5 +1,10 @@
 import ReactDom from "react-dom";
-import {App} from "./App";
+import {ConnectedApp} from "./ConnectedApp";
 import React from "react";
+import {store} from "./store";
+import {addDummyAsset, addDummyAsset2} from "./actions";
+import {Provider} from "react-redux";
 
-ReactDom.render(<App />, document.getElementById("app"));
+ReactDom.render(<Provider store={store}><ConnectedApp /></Provider> , document.getElementById("app"));
+
+store.dispatch(addDummyAsset2());
