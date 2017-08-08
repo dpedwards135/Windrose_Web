@@ -32481,6 +32481,18 @@ var DbObjectView = function (_React$Component) {
         _this.SUBMIT_BUTTON = 5;
 
         _this.state = {
+
+            objectDescription: "Object Description",
+            objectUniqueId: "Unique ID",
+            objectProperties: {
+                1: { 0: "name", 1: "5", 2: "Company Name", 3: "Bob's Lumber", 4: "Company Name" },
+                2: { 0: "phone", 1: "5", 2: "Phone Number", 3: "", 4: "Phone Number" },
+                3: { 0: "address", 1: "5", 2: "Address", 3: "", 4: "Address" },
+                4: { 0: "email", 1: "5", 2: "Email Address", 3: "", 4: "Email Address" },
+                5: { 0: "finalize_buttons", 1: "2", 2: "Submit when finished: ", 3: "true", 4: "true", 5: "true" },
+                "wmodel_class": { 0: "wmodel_class", 1: "0", 2: "company" }
+            },
+
             displayObjectId: _this.props.selectedObject,
             displayObject: { properties: ["1", "2"] },
             editable: _this.props.editable,
@@ -32488,9 +32500,7 @@ var DbObjectView = function (_React$Component) {
         };
 
         _this.getFBObject = _this.getFBObject.bind(_this);
-        _this.renderDbObject = _this.renderDbObject.bind(_this);
-        _this.display = _this.display.bind(_this);
-        //this.getFBObject();
+        _this.renderField = _this.renderField.bind(_this);
         return _this;
     }
 
@@ -32534,71 +32544,98 @@ var DbObjectView = function (_React$Component) {
     }, {
         key: "componentDidMount",
         value: function componentDidMount() {
-            this.getFBObject();
+            //this.getFBObject();
         }
     }, {
-        key: "display",
-        value: function display(listOfProperties) {
-            console.log(listOfProperties);
-            switch (listOfProperties[this.FORM_FIELD_TYPE]) {
-                case this.EXCLUDE:
-                    return _react2.default.createElement("div", null);
-                case this.TEXT_EDIT:
-                    return _react2.default.createElement(
-                        "div",
-                        null,
-                        _react2.default.createElement(
-                            "p",
-                            null,
-                            listOfProperties[this.DISPLAY_TEXT]
-                        ),
-                        _react2.default.createElement("input", null)
-                    );
-            }
-        }
-    }, {
-        key: "renderDbObject",
-        value: function renderDbObject(dbObject) {
-            var formFields = [];
-            var properties = dbObject.properties;
+        key: "renderField",
+        value: function renderField() {
+            var count = Object.keys(this.state.objectProperties).length;
+            console.log("Count: " + count);
+            var field = void 0;
+            var fields = new Array();
+            var counter = 1;
+            while (counter < count) {
 
-            //Render FormFields
-            if (properties) {
-                for (var property in properties) {
-                    console.log("ARRAY? " + JSON.stringify(properties[property]));
-                    var propArray = properties[property];
-                    propArray.map(function (element) {
-                        return console.log(JSON.stringify(element));
-                    });
-                    if (propArray[this.FORM_FIELD_TYPE === this.TEXT_EDIT]) {
-                        console.log("LOOP");
-                        formFields.concat(_react2.default.createElement(
-                            "h1",
+                console.log("Start loop " + counter);
+                var property = this.state.objectProperties[counter];
+                console.log(JSON.stringify(property));
+                console.log("Value: " + property[this.FORM_FIELD_TYPE]);
+                switch (Number.parseInt(property[this.FORM_FIELD_TYPE])) {
+
+                    case this.EXCLUDE:
+                        field = _react2.default.createElement(
+                            "div",
                             null,
-                            "FormField"
-                        ));
-                    }
+                            "Excluded Field"
+                        );
+                        break;
+                    case this.CHECKBOX:
+                        field = _react2.default.createElement(
+                            "div",
+                            null,
+                            "CheckBox"
+                        );
+                        break;
+                    case this.FINALIZE_BUTTONS:
+                        field = _react2.default.createElement(
+                            "div",
+                            null,
+                            "FinalizeButtons"
+                        );
+                        break;
+                    case this.GEOSTOP:
+                        field = _react2.default.createElement(
+                            "div",
+                            null,
+                            "GeoStop"
+                        );
+                        break;
+                    case this.SELECT_FROM:
+                        field = _react2.default.createElement(
+                            "div",
+                            null,
+                            "SelectFrom"
+                        );
+                        break;
+                    case this.TEXT_EDIT:
+                        field = _react2.default.createElement(
+                            "div",
+                            null,
+                            "TextEdit ",
+                            property[this.DISPLAY_TEXT],
+                            _react2.default.createElement("br", null),
+                            _react2.default.createElement("input", { type: "text", placeholder: property[this.SELECTED_VALUE] }),
+                            _react2.default.createElement("br", null),
+                            _react2.default.createElement("br", null)
+                        );
+                        break;
+                    case this.TEXT_VIEW:
+                        field = _react2.default.createElement(
+                            "div",
+                            null,
+                            "TextView"
+                        );
+                        break;
+                    default:
+                        field = _react2.default.createElement(
+                            "div",
+                            null,
+                            "Default"
+                        );
+                        break;
                 }
-                console.log(JSON.stringify(formFields));
+                fields.push(field);
+                console.log("Added Field");
+                counter++;
             }
 
-            var rendered = _react2.default.createElement("div", null);
-            if (Object.keys(dbObject).length === 0) {
-                rendered = _react2.default.createElement(
-                    "div",
-                    null,
-                    "Empty Div"
-                );
-            } else {
-                rendered = _react2.default.createElement(
-                    "div",
-                    null,
-                    "ID: ",
-                    dbObject.uniqueID
-                );
-            }
-
-            return rendered;
+            return _react2.default.createElement(
+                "div",
+                null,
+                " ",
+                fields,
+                " "
+            );
         }
     }, {
         key: "render",
@@ -32609,6 +32646,7 @@ var DbObjectView = function (_React$Component) {
                 on that fieldType
             */
 
+            var fields = this.renderField();
             return _react2.default.createElement(
                 "div",
                 null,
@@ -32617,7 +32655,7 @@ var DbObjectView = function (_React$Component) {
                 " ",
                 JSON.stringify(this.state.properties),
                 this.state.properties = this.state.displayObject.properties,
-                this.state.properties.map(this.display)
+                fields
             );
         }
     }]);
@@ -32626,6 +32664,28 @@ var DbObjectView = function (_React$Component) {
 }(_react2.default.Component);
 
 exports.DbObjectView = DbObjectView;
+
+/*
+    What I want to do:
+    Take a list of properties
+    Render each property differently depending on FormField type
+    Function takes a list of objects and returns JSX div with ID
+
+    When submit is clicked it cycles through all the divs and takes the values and puts them
+    into the DBObject based on div ID then sends that object to Firebase.
+
+This works:
+render() {
+    let task;
+    if (!apocalypse) {
+      task = <div>Div 1</div>;
+    } else {
+      task = <div>Div 2</div>;
+    }
+
+    return task;
+  }
+*/
 
 /***/ }),
 /* 257 */

@@ -8,7 +8,6 @@ import * as firebase from "firebase";
 class DbObjectView extends React.Component {
 
 
-
     constructor(props) {
         super(props);
         this.EXCLUDE = 0;
@@ -28,15 +27,26 @@ class DbObjectView extends React.Component {
         this.SUBMIT_BUTTON = 5;
 
         this.state = {
+
+            objectDescription: "Object Description",
+            objectUniqueId: "Unique ID",
+            objectProperties: {
+                1: { 0:"name", 1:"5", 2:"Company Name", 3:"Bob's Lumber", 4:"Company Name" }, 
+                2: { 0:"phone", 1:"5", 2:"Phone Number", 3:"", 4:"Phone Number" },
+                3: { 0:"address", 1:"5", 2:"Address", 3:"", 4:"Address" },
+                4: { 0:"email", 1:"5", 2:"Email Address", 3:"", 4:"Email Address"},
+                5: { 0:"finalize_buttons", 1:"2", 2:"Submit when finished: ", 3:"true", 4:"true", 5:"true" },
+                "wmodel_class": { 0:"wmodel_class", 1:"0", 2:"company" }
+            },
+
             displayObjectId: this.props.selectedObject,
             displayObject: { properties: ["1", "2"] },
             editable: this.props.editable,
             properties: ["3", "4"]
-            //Put a proper Object in here to work with.
         };
 
         this.getFBObject = this.getFBObject.bind(this);
-
+        this.renderField = this.renderField.bind(this);
     }
 
     getFBObject() {
@@ -76,39 +86,64 @@ class DbObjectView extends React.Component {
     }
 
     componentDidMount() {
-        this.getFBObject();
+        //this.getFBObject();
     }
 
-    renderField(property  /* A property of DbObject */ ) {
+    renderField() {
+        let count = Object.keys(this.state.objectProperties).length;
+        console.log("Count: " + count);
         let field;
-        switch (property[FORM_FIELD_TYPE]) {
-            case EXCLUDE:
+        let fields = new Array();
+        let counter = 1;
+        while(counter < count) {
+            
+            console.log("Start loop " + counter);
+            let property = this.state.objectProperties[counter];
+            console.log(JSON.stringify(property));
+            console.log("Value: " + property[this.FORM_FIELD_TYPE]);
+        switch (Number.parseInt(property[this.FORM_FIELD_TYPE])) {
+            
+            case this.EXCLUDE:
             field = <div>Excluded Field</div>;
             break;
-            case CHECKBOX:
+            case this.CHECKBOX:
             field = <div>CheckBox</div>;
             break;
-            case FINALIZE_BUTTONS:
+            case this.FINALIZE_BUTTONS:
             field = <div>FinalizeButtons</div>;
             break;
-            case GEOSTOP:
+            case this.GEOSTOP:
             field = <div>GeoStop</div>;
             break;
-            case SELECT_FROM:
+            case this.SELECT_FROM:
             field = <div>SelectFrom</div>;
             break;
-            case TEXT_EDIT:
-            field = <div>TextEdit</div>;
+            case this.TEXT_EDIT:
+            field = 
+                <div>
+                    TextEdit {property[this.DISPLAY_TEXT]}
+                    <br />
+                    <input type="text" placeholder={property[this.SELECTED_VALUE]} />
+                    <br />
+                    <br />
+                </div>;
             break;
-            case TEXT_VIEW:
-            field = <div>TextView</div>;
+            case this.TEXT_VIEW:
+            field = 
+                <div>
+                    TextView
+                </div>;
             break;
             default:
             field = <div>Default</div>;
             break;
         }
+        fields.push(field);
+        console.log("Added Field");
+        counter++;
+        }
 
-        return <div /*id={property[PROPERTY_NAME]}*/> {field} </div>;
+        return <div> {fields} </div>;
 
     }
 
@@ -120,12 +155,12 @@ class DbObjectView extends React.Component {
             on that fieldType
         */
 
-
+        let fields = this.renderField();
         return (
             <div>
                 DBObjectView {this.state.displayObjectId} {JSON.stringify(this.state.properties)}
                 {this.state.properties = this.state.displayObject.properties}
-                {this.state.properties.map(renderField)}
+                {fields}
             </div>
         );
     }
