@@ -32464,25 +32464,45 @@ var DbObjectView = function (_React$Component) {
 
         var _this = _possibleConstructorReturn(this, (DbObjectView.__proto__ || Object.getPrototypeOf(DbObjectView)).call(this, props));
 
+        _this.EXCLUDE = 0;
+        _this.CHECKBOX = 1;
+        _this.FINALIZE_BUTTONS = 2;
+        _this.GEOSTOP = 3;
+        _this.SELECT_FROM = 4;
+        _this.TEXT_EDIT = 5;
+        _this.TEXT_VIEW = 6;
+
+        _this.PROPERTY_NAME = 0;
+        _this.FORM_FIELD_TYPE = 1;
+        _this.DISPLAY_TEXT = 2;
+        _this.SELECTED_VALUE = 3;
+        _this.CANCEL_BUTTON = 3;
+        _this.SAVE_BUTTON = 4;
+        _this.SUBMIT_BUTTON = 5;
+
         _this.state = {
             displayObjectId: _this.props.selectedObject,
-            displayObject: {},
-            editable: _this.props.editable
+            displayObject: { properties: ["1", "2"] },
+            editable: _this.props.editable,
+            properties: ["3", "4"]
         };
 
         _this.getFBObject = _this.getFBObject.bind(_this);
-
-        _this.getFBObject();
+        _this.renderDbObject = _this.renderDbObject.bind(_this);
+        _this.display = _this.display.bind(_this);
+        //this.getFBObject();
         return _this;
     }
 
     _createClass(DbObjectView, [{
         key: "getFBObject",
         value: function getFBObject() {
+            var _this2 = this;
+
             var dbObject = {
                 uniqueID: "",
                 description: "",
-                properties: []
+                properties: {}
             };
 
             console.log("GetFBObject");
@@ -32498,22 +32518,92 @@ var DbObjectView = function (_React$Component) {
 
                 dbref.child("properties").once('value', function (snapshot) {
                     snapshot.forEach(function (childSnapshot) {
-                        console.log(childSnapshot.val().length);
-                        console.log(childSnapshot.val()[0]);
+                        var newObject = {};
+                        newObject["" + childSnapshot.key] = childSnapshot.val();
+                        dbObject.properties[0].push(newObject);
+                        //dbObject.properties["" + childSnapshot.key] = childSnapshot.val();
+                        console.log("added property");
                     });
+
+                    console.log(JSON.stringify(dbObject));
+                    _this2.setState({ displayObject: dbObject });
+                    console.log("DisplayObject toString: " + JSON.stringify(_this2.state));
                 });
-                /*
-                for(var property in snapshot.val().properties) {
-                    for(var child in property) {
-                        console.log(child.val());
+            });
+        }
+    }, {
+        key: "componentDidMount",
+        value: function componentDidMount() {
+            this.getFBObject();
+        }
+    }, {
+        key: "display",
+        value: function display(listOfProperties) {
+            console.log(listOfProperties);
+            switch (listOfProperties[this.FORM_FIELD_TYPE]) {
+                case this.EXCLUDE:
+                    return _react2.default.createElement("div", null);
+                case this.TEXT_EDIT:
+                    return _react2.default.createElement(
+                        "div",
+                        null,
+                        _react2.default.createElement(
+                            "p",
+                            null,
+                            listOfProperties[this.DISPLAY_TEXT]
+                        ),
+                        _react2.default.createElement("input", null)
+                    );
+            }
+        }
+    }, {
+        key: "renderDbObject",
+        value: function renderDbObject(dbObject) {
+            var formFields = [];
+            var properties = dbObject.properties;
+
+            //Render FormFields
+            if (properties) {
+                for (var property in properties) {
+                    console.log("ARRAY? " + JSON.stringify(properties[property]));
+                    var propArray = properties[property];
+                    propArray.map(function (element) {
+                        return console.log(JSON.stringify(element));
+                    });
+                    if (propArray[this.FORM_FIELD_TYPE === this.TEXT_EDIT]) {
+                        console.log("LOOP");
+                        formFields.concat(_react2.default.createElement(
+                            "h1",
+                            null,
+                            "FormField"
+                        ));
                     }
                 }
-                */
-            });
+                console.log(JSON.stringify(formFields));
+            }
+
+            var rendered = _react2.default.createElement("div", null);
+            if (Object.keys(dbObject).length === 0) {
+                rendered = _react2.default.createElement(
+                    "div",
+                    null,
+                    "Empty Div"
+                );
+            } else {
+                rendered = _react2.default.createElement(
+                    "div",
+                    null,
+                    "ID: ",
+                    dbObject.uniqueID
+                );
+            }
+
+            return rendered;
         }
     }, {
         key: "render",
         value: function render() {
+            console.log("rendering dbObjectView");
             /*
                 For Element in DBObject - get fieldType and add a cell based 
                 on that fieldType
@@ -32523,7 +32613,11 @@ var DbObjectView = function (_React$Component) {
                 "div",
                 null,
                 "DBObjectView ",
-                this.state.displayObjectId
+                this.state.displayObjectId,
+                " ",
+                JSON.stringify(this.state.properties),
+                this.state.properties = this.state.displayObject.properties,
+                this.state.properties.map(this.display)
             );
         }
     }]);
