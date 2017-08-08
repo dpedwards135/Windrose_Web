@@ -32487,9 +32487,11 @@ var DbObjectView = function (_React$Component) {
             objectProperties: {
                 1: { 0: "name", 1: "5", 2: "Company Name", 3: "Bob's Lumber", 4: "Company Name" },
                 2: { 0: "phone", 1: "5", 2: "Phone Number", 3: "", 4: "Phone Number" },
-                3: { 0: "address", 1: "5", 2: "Address", 3: "", 4: "Address" },
+                3: { 0: "address", 1: "6", 2: "Address", 3: "123 Lumber Yard Rd., Brookeville, WI", 4: "Address" },
                 4: { 0: "email", 1: "5", 2: "Email Address", 3: "", 4: "Email Address" },
                 5: { 0: "finalize_buttons", 1: "2", 2: "Submit when finished: ", 3: "true", 4: "true", 5: "true" },
+                6: { 0: "random_checkbox", 1: "1", 2: "Check something", 3: "true" },
+                7: { 0: "random_SelectFrom", 1: "4", 2: "Select something", 3: "Grapefruit", 4: "Oranges", 5: "Grapefruit", 6: "Bananas", 7: "Apples" },
                 "wmodel_class": { 0: "wmodel_class", 1: "0", 2: "company" }
             },
 
@@ -32573,7 +32575,10 @@ var DbObjectView = function (_React$Component) {
                         field = _react2.default.createElement(
                             "div",
                             null,
-                            "CheckBox"
+                            property[this.DISPLAY_TEXT],
+                            _react2.default.createElement("br", null),
+                            _react2.default.createElement("input", { type: "checkbox", defaultChecked: property[this.SELECTED_VALUE] }),
+                            _react2.default.createElement("br", null)
                         );
                         break;
                     case this.FINALIZE_BUTTONS:
@@ -32591,17 +32596,44 @@ var DbObjectView = function (_React$Component) {
                         );
                         break;
                     case this.SELECT_FROM:
+                        var options = [];
+                        var optionsCounter = 4;
+                        while (optionsCounter <= Object.keys(this.state.objectProperties).length) {
+                            var newOption = property[optionsCounter];
+                            options.push(newOption);
+                            optionsCounter++;
+                        }
+
                         field = _react2.default.createElement(
                             "div",
                             null,
-                            "SelectFrom"
+                            property[this.DISPLAY_TEXT],
+                            _react2.default.createElement("br", null),
+                            _react2.default.createElement(
+                                "select",
+                                { defaultValue: property[this.SELECTED_VALUE] },
+                                _react2.default.createElement(
+                                    "option",
+                                    { value: "", disabled: true },
+                                    "Default Value"
+                                ),
+                                options.map(function (option) {
+                                    console.log(option);
+                                    return _react2.default.createElement(
+                                        "option",
+                                        null,
+                                        option
+                                    );
+                                })
+                            ),
+                            _react2.default.createElement("br", null),
+                            _react2.default.createElement("br", null)
                         );
                         break;
                     case this.TEXT_EDIT:
                         field = _react2.default.createElement(
                             "div",
                             null,
-                            "TextEdit ",
                             property[this.DISPLAY_TEXT],
                             _react2.default.createElement("br", null),
                             _react2.default.createElement("input", { type: "text", placeholder: property[this.SELECTED_VALUE] }),
@@ -32613,14 +32645,22 @@ var DbObjectView = function (_React$Component) {
                         field = _react2.default.createElement(
                             "div",
                             null,
-                            "TextView"
+                            property[this.DISPLAY_TEXT],
+                            ":",
+                            _react2.default.createElement("br", null),
+                            _react2.default.createElement(
+                                "p",
+                                null,
+                                property[this.SELECTED_VALUE]
+                            ),
+                            _react2.default.createElement("br", null)
                         );
                         break;
                     default:
                         field = _react2.default.createElement(
                             "div",
                             null,
-                            "Default"
+                            "DefaultDiv"
                         );
                         break;
                 }
@@ -32666,6 +32706,13 @@ var DbObjectView = function (_React$Component) {
 exports.DbObjectView = DbObjectView;
 
 /*
+
+Next: 
+    1. Finish building formfields based on type
+    2. Reconnect Firebase objects to UI
+    3. Save values to state Object on Save or Submit
+    4. Save DBObject to Firebase on Save or Submit
+
     What I want to do:
     Take a list of properties
     Render each property differently depending on FormField type
