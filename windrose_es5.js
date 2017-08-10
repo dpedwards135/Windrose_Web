@@ -32496,9 +32496,7 @@ var DbObjectView = function (_React$Component) {
             },
 
             displayObjectId: _this.props.selectedObject,
-            displayObject: { properties: ["1", "2"] },
-            editable: _this.props.editable,
-            properties: ["3", "4"]
+            editable: _this.props.editable
         };
 
         _this.getFBObject = _this.getFBObject.bind(_this);
@@ -32545,9 +32543,7 @@ var DbObjectView = function (_React$Component) {
                         objectDescription: dbObject.description,
                         objectUniqueId: dbObject.uniqueID,
                         objectProperties: dbObject.properties
-                        //displayObject: dbObject 
                     });
-                    console.log("DisplayObject toString: " + JSON.stringify(_this2.state));
                 });
             });
         }
@@ -32566,117 +32562,174 @@ var DbObjectView = function (_React$Component) {
             while (counter < count) {
 
                 var property = this.state.objectProperties[counter];
-                switch (Number.parseInt(property[this.FORM_FIELD_TYPE])) {
 
-                    case this.EXCLUDE:
-                        field = _react2.default.createElement(
-                            "div",
-                            null,
-                            "Excluded Field"
-                        );
-                        break;
-                    case this.CHECKBOX:
-                        field = _react2.default.createElement(
-                            "div",
-                            null,
-                            property[this.DISPLAY_TEXT],
-                            _react2.default.createElement("br", null),
-                            _react2.default.createElement("input", { type: "checkbox", defaultChecked: property[this.SELECTED_VALUE] }),
-                            _react2.default.createElement("br", null)
-                        );
-                        break;
-                    case this.FINALIZE_BUTTONS:
-                        var displaySubmit = void 0;
-                        var displaySave = void 0;
-                        var displayCancel = void 0;
+                if (this.state.editable === "false") {
+                    switch (Number.parseInt(property[this.FORM_FIELD_TYPE])) {
 
-                        field = _react2.default.createElement(
-                            "div",
-                            null,
-                            property[this.DISPLAY_TEXT],
-                            _react2.default.createElement("input", { type: "button", value: "Submit", style: { display: property[this.SUBMIT_BUTTON] == "true" ? '' : 'none' } }),
-                            _react2.default.createElement("input", { type: "button", value: "Save", style: { display: property[this.SAVE_BUTTON] == "true" ? '' : 'none' } }),
-                            _react2.default.createElement("input", { type: "button", value: "Cancel", style: { display: property[this.CANCEL_BUTTON] == "true" ? '' : 'none' } })
-                        );
-                        break;
-                    case this.GEOSTOP:
-                        field = _react2.default.createElement(
-                            "div",
-                            null,
-                            "GeoStop"
-                        );
-                        break;
-                    case this.SELECT_FROM:
-                        var options = [];
-                        var optionsCounter = 4;
-                        while (optionsCounter <= Object.keys(this.state.objectProperties).length) {
-                            var newOption = property[optionsCounter];
-                            options.push(newOption);
-                            optionsCounter++;
-                        }
-
-                        field = _react2.default.createElement(
-                            "div",
-                            null,
-                            property[this.DISPLAY_TEXT],
-                            _react2.default.createElement("br", null),
-                            _react2.default.createElement(
-                                "select",
-                                { defaultValue: property[this.SELECTED_VALUE] },
-                                _react2.default.createElement(
-                                    "option",
-                                    { value: "", disabled: true },
-                                    "Default Value"
-                                ),
-                                options.map(function (option) {
-                                    return _react2.default.createElement(
-                                        "option",
-                                        null,
-                                        option
-                                    );
-                                })
-                            ),
-                            _react2.default.createElement("br", null),
-                            _react2.default.createElement("br", null)
-                        );
-                        break;
-                    case this.TEXT_EDIT:
-                        field = _react2.default.createElement(
-                            "div",
-                            null,
-                            property[this.DISPLAY_TEXT],
-                            _react2.default.createElement("br", null),
-                            _react2.default.createElement("input", { type: "text", placeholder: property[this.SELECTED_VALUE] }),
-                            _react2.default.createElement("br", null),
-                            _react2.default.createElement("br", null)
-                        );
-                        break;
-                    case this.TEXT_VIEW:
-                        field = _react2.default.createElement(
-                            "div",
-                            null,
-                            property[this.DISPLAY_TEXT],
-                            ":",
-                            _react2.default.createElement("br", null),
-                            _react2.default.createElement(
-                                "p",
+                        case this.EXCLUDE:
+                            field = _react2.default.createElement(
+                                "div",
                                 null,
-                                property[this.SELECTED_VALUE]
-                            ),
-                            _react2.default.createElement("br", null)
-                        );
-                        break;
-                    default:
-                        field = _react2.default.createElement(
-                            "div",
-                            null,
-                            "DefaultDiv"
-                        );
-                        break;
+                                "Excluded Field"
+                            );
+                            break;
+                        case this.FINALIZE_BUTTONS:
+                            field = _react2.default.createElement(
+                                "div",
+                                null,
+                                "Finalize Buttons"
+                            );
+                            break;
+                        case this.GEOSTOP:
+                            field = _react2.default.createElement(
+                                "div",
+                                null,
+                                "GeoStop"
+                            );
+                            break;
+                        case this.CHECKBOX:
+                        case this.SELECT_FROM:
+                        case this.TEXT_EDIT:
+                        case this.TEXT_VIEW:
+                            field = _react2.default.createElement(
+                                "div",
+                                null,
+                                property[this.DISPLAY_TEXT],
+                                ":",
+                                _react2.default.createElement("br", null),
+                                _react2.default.createElement(
+                                    "p",
+                                    null,
+                                    property[this.SELECTED_VALUE]
+                                ),
+                                _react2.default.createElement("br", null)
+                            );
+                            break;
+                        default:
+                            field = _react2.default.createElement(
+                                "div",
+                                null,
+                                "DefaultDiv"
+                            );
+                            break;
+                    }
+                    fields.push(field);
+                    console.log("Added Field");
+                    counter++;
+                } else {
+
+                    switch (Number.parseInt(property[this.FORM_FIELD_TYPE])) {
+
+                        case this.EXCLUDE:
+                            field = _react2.default.createElement(
+                                "div",
+                                null,
+                                "Excluded Field"
+                            );
+                            break;
+                        case this.CHECKBOX:
+                            field = _react2.default.createElement(
+                                "div",
+                                null,
+                                property[this.DISPLAY_TEXT],
+                                _react2.default.createElement("br", null),
+                                _react2.default.createElement("input", { type: "checkbox", defaultChecked: property[this.SELECTED_VALUE] }),
+                                _react2.default.createElement("br", null)
+                            );
+                            break;
+                        case this.FINALIZE_BUTTONS:
+                            var displaySubmit = void 0;
+                            var displaySave = void 0;
+                            var displayCancel = void 0;
+
+                            field = _react2.default.createElement(
+                                "div",
+                                null,
+                                property[this.DISPLAY_TEXT],
+                                _react2.default.createElement("input", { type: "button", value: "Submit", style: { display: property[this.SUBMIT_BUTTON] == "true" ? '' : 'none' } }),
+                                _react2.default.createElement("input", { type: "button", value: "Save", style: { display: property[this.SAVE_BUTTON] == "true" ? '' : 'none' } }),
+                                _react2.default.createElement("input", { type: "button", value: "Cancel", style: { display: property[this.CANCEL_BUTTON] == "true" ? '' : 'none' } })
+                            );
+                            break;
+                        case this.GEOSTOP:
+                            field = _react2.default.createElement(
+                                "div",
+                                null,
+                                "GeoStop"
+                            );
+                            break;
+                        case this.SELECT_FROM:
+                            var options = [];
+                            var optionsCounter = 4;
+                            while (optionsCounter <= Object.keys(this.state.objectProperties).length) {
+                                var newOption = property[optionsCounter];
+                                options.push(newOption);
+                                optionsCounter++;
+                            }
+
+                            field = _react2.default.createElement(
+                                "div",
+                                null,
+                                property[this.DISPLAY_TEXT],
+                                _react2.default.createElement("br", null),
+                                _react2.default.createElement(
+                                    "select",
+                                    { defaultValue: property[this.SELECTED_VALUE] },
+                                    _react2.default.createElement(
+                                        "option",
+                                        { value: "", disabled: true },
+                                        "Default Value"
+                                    ),
+                                    options.map(function (option) {
+                                        return _react2.default.createElement(
+                                            "option",
+                                            null,
+                                            option
+                                        );
+                                    })
+                                ),
+                                _react2.default.createElement("br", null),
+                                _react2.default.createElement("br", null)
+                            );
+                            break;
+                        case this.TEXT_EDIT:
+                            field = _react2.default.createElement(
+                                "div",
+                                null,
+                                property[this.DISPLAY_TEXT],
+                                _react2.default.createElement("br", null),
+                                _react2.default.createElement("input", { type: "text", placeholder: property[this.SELECTED_VALUE] }),
+                                _react2.default.createElement("br", null),
+                                _react2.default.createElement("br", null)
+                            );
+                            break;
+                        case this.TEXT_VIEW:
+                            field = _react2.default.createElement(
+                                "div",
+                                null,
+                                property[this.DISPLAY_TEXT],
+                                ":",
+                                _react2.default.createElement("br", null),
+                                _react2.default.createElement(
+                                    "p",
+                                    null,
+                                    property[this.SELECTED_VALUE]
+                                ),
+                                _react2.default.createElement("br", null)
+                            );
+                            break;
+                        default:
+                            field = _react2.default.createElement(
+                                "div",
+                                null,
+                                "DefaultDiv"
+                            );
+                            break;
+                    }
+                    fields.push(field);
+                    console.log("Added Field");
+                    counter++;
                 }
-                fields.push(field);
-                console.log("Added Field");
-                counter++;
             }
 
             return _react2.default.createElement(
@@ -32702,11 +32755,6 @@ var DbObjectView = function (_React$Component) {
             return _react2.default.createElement(
                 "div",
                 null,
-                "DBObjectView ",
-                this.state.displayObjectId,
-                " ",
-                JSON.stringify(this.state.properties),
-                this.state.properties = this.state.displayObject.properties,
                 fields
             );
         }

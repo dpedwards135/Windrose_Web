@@ -42,9 +42,7 @@ class DbObjectView extends React.Component {
             },
 
             displayObjectId: this.props.selectedObject,
-            displayObject: { properties: ["1", "2"] },
             editable: this.props.editable,
-            properties: ["3", "4"]
         };
 
         this.getFBObject = this.getFBObject.bind(this);
@@ -84,13 +82,11 @@ class DbObjectView extends React.Component {
                 );
 
                 console.log(JSON.stringify(dbObject));
-                this.setState({ 
+                this.setState({
                     objectDescription: dbObject.description,
                     objectUniqueId: dbObject.uniqueID,
                     objectProperties: dbObject.properties,
-                    //displayObject: dbObject 
                 });
-                console.log("DisplayObject toString: " + JSON.stringify(this.state));
             });
         });
     }
@@ -107,85 +103,120 @@ class DbObjectView extends React.Component {
         while (counter < count) {
 
             let property = this.state.objectProperties[counter];
-            switch (Number.parseInt(property[this.FORM_FIELD_TYPE])) {
 
-                case this.EXCLUDE:
-                    field = <div>Excluded Field</div>;
-                    break;
-                case this.CHECKBOX:
-                    field =
-                        <div>
-                            {property[this.DISPLAY_TEXT]}
-                            <br />
-                            <input type="checkbox" defaultChecked={property[this.SELECTED_VALUE]} />
-                            <br />
-                        </div>;
-                    break;
-                case this.FINALIZE_BUTTONS:
-                    let displaySubmit;
-                    let displaySave;
-                    let displayCancel;
+            if (this.state.editable === "false") {
+                switch (Number.parseInt(property[this.FORM_FIELD_TYPE])) {
 
-                    field = <div>
-                            {property[this.DISPLAY_TEXT]}
-                            <input type="button" value="Submit" style={{display: ((property[this.SUBMIT_BUTTON]) == "true") ? '' : 'none'}} />
-                            <input type="button" value="Save" style={{display: ((property[this.SAVE_BUTTON]) == "true") ? '' : 'none'}} />
-                            <input type="button" value="Cancel" style={{display: ((property[this.CANCEL_BUTTON]) == "true") ? '' : 'none'}} />
-                        </div>;
-                    break;
-                case this.GEOSTOP:
-                    field = <div>GeoStop</div>;
-                    break;
-                case this.SELECT_FROM:
-                    let options = [];
-                    let optionsCounter = 4;
-                    while (optionsCounter <= Object.keys(this.state.objectProperties).length) {
-                        let newOption = property[optionsCounter];
-                        options.push(newOption);
-                        optionsCounter++;
-                    }
-
-                    field = <div>
-                        {property[this.DISPLAY_TEXT]}
-                        <br />
-                        <select defaultValue={property[this.SELECTED_VALUE]} >
-                            <option value="" disabled>Default Value</option>
-                            {
-                                options.map((option) => {
-                                    return <option>{option}</option>;
-                                })
-                            }
-                        </select>
-                        <br />
-                        <br />
-                    </div>;
-                    break;
-                case this.TEXT_EDIT:
-                    field =
-                        <div>
-                            {property[this.DISPLAY_TEXT]}
-                            <br />
-                            <input type="text" placeholder={property[this.SELECTED_VALUE]} />
-                            <br />
-                            <br />
-                        </div>;
-                    break;
-                case this.TEXT_VIEW:
-                    field =
-                        <div>
-                            {property[this.DISPLAY_TEXT]}:
+                    case this.EXCLUDE:
+                        field = <div>Excluded Field</div>;
+                        break;
+                    case this.FINALIZE_BUTTONS:
+                        field = <div>Finalize Buttons</div>;
+                        break;
+                    case this.GEOSTOP:
+                        field = <div>GeoStop</div>;
+                        break;
+                    case this.CHECKBOX:
+                    case this.SELECT_FROM:
+                    case this.TEXT_EDIT:
+                    case this.TEXT_VIEW:
+                        field =
+                            <div>
+                                {property[this.DISPLAY_TEXT]}:
                     <br />
-                            <p>{property[this.SELECTED_VALUE]}</p>
+                                <p>{property[this.SELECTED_VALUE]}</p>
+                                <br />
+                            </div>;
+                        break;
+                    default:
+                        field = <div>DefaultDiv</div>;
+                        break;
+                }
+                fields.push(field);
+                console.log("Added Field");
+                counter++;
+            } else {
+
+                switch (Number.parseInt(property[this.FORM_FIELD_TYPE])) {
+
+                    case this.EXCLUDE:
+                        field = <div>Excluded Field</div>;
+                        break;
+                    case this.CHECKBOX:
+                        field =
+                            <div>
+                                {property[this.DISPLAY_TEXT]}
+                                <br />
+                                <input type="checkbox" defaultChecked={property[this.SELECTED_VALUE]} />
+                                <br />
+                            </div>;
+                        break;
+                    case this.FINALIZE_BUTTONS:
+                        let displaySubmit;
+                        let displaySave;
+                        let displayCancel;
+
+                        field = <div>
+                            {property[this.DISPLAY_TEXT]}
+                            <input type="button" value="Submit" style={{ display: ((property[this.SUBMIT_BUTTON]) == "true") ? '' : 'none' }} />
+                            <input type="button" value="Save" style={{ display: ((property[this.SAVE_BUTTON]) == "true") ? '' : 'none' }} />
+                            <input type="button" value="Cancel" style={{ display: ((property[this.CANCEL_BUTTON]) == "true") ? '' : 'none' }} />
+                        </div>;
+                        break;
+                    case this.GEOSTOP:
+                        field = <div>GeoStop</div>;
+                        break;
+                    case this.SELECT_FROM:
+                        let options = [];
+                        let optionsCounter = 4;
+                        while (optionsCounter <= Object.keys(this.state.objectProperties).length) {
+                            let newOption = property[optionsCounter];
+                            options.push(newOption);
+                            optionsCounter++;
+                        }
+
+                        field = <div>
+                            {property[this.DISPLAY_TEXT]}
+                            <br />
+                            <select defaultValue={property[this.SELECTED_VALUE]} >
+                                <option value="" disabled>Default Value</option>
+                                {
+                                    options.map((option) => {
+                                        return <option>{option}</option>;
+                                    })
+                                }
+                            </select>
+                            <br />
                             <br />
                         </div>;
-                    break;
-                default:
-                    field = <div>DefaultDiv</div>;
-                    break;
+                        break;
+                    case this.TEXT_EDIT:
+                        field =
+                            <div>
+                                {property[this.DISPLAY_TEXT]}
+                                <br />
+                                <input type="text" placeholder={property[this.SELECTED_VALUE]} />
+                                <br />
+                                <br />
+                            </div>;
+                        break;
+                    case this.TEXT_VIEW:
+                        field =
+                            <div>
+                                {property[this.DISPLAY_TEXT]}:
+                    <br />
+                                <p>{property[this.SELECTED_VALUE]}</p>
+                                <br />
+                            </div>;
+                        break;
+                    default:
+                        field = <div>DefaultDiv</div>;
+                        break;
+                }
+                fields.push(field);
+                console.log("Added Field");
+                counter++;
             }
-            fields.push(field);
-            console.log("Added Field");
-            counter++;
         }
 
         return (
@@ -208,8 +239,6 @@ class DbObjectView extends React.Component {
         let fields = this.renderField();
         return (
             <div>
-                DBObjectView {this.state.displayObjectId} {JSON.stringify(this.state.properties)}
-                {this.state.properties = this.state.displayObject.properties}
                 {fields}
             </div>
         );
