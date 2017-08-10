@@ -111,7 +111,7 @@ class DbObjectView extends React.Component {
                         field = <div>Excluded Field</div>;
                         break;
                     case this.FINALIZE_BUTTONS:
-                        field = <div>Finalize Buttons</div>;
+                        field = <div></div>;
                         break;
                     case this.GEOSTOP:
                         field = <div>GeoStop</div>;
