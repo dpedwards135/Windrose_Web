@@ -32489,9 +32489,9 @@ var DbObjectView = function (_React$Component) {
                 2: { 0: "phone", 1: "5", 2: "Phone Number", 3: "", 4: "Phone Number" },
                 3: { 0: "address", 1: "6", 2: "Address", 3: "123 Lumber Yard Rd., Brookeville, WI", 4: "Address" },
                 4: { 0: "email", 1: "5", 2: "Email Address", 3: "", 4: "Email Address" },
-                5: { 0: "finalize_buttons", 1: "2", 2: "Submit when finished: ", 3: "true", 4: "true", 5: "true" },
+                7: { 0: "finalize_buttons", 1: "2", 2: "Submit when finished: ", 3: "false", 4: "true", 5: "false" },
                 6: { 0: "random_checkbox", 1: "1", 2: "Check something", 3: "true" },
-                7: { 0: "random_SelectFrom", 1: "4", 2: "Select something", 3: "Grapefruit", 4: "Oranges", 5: "Grapefruit", 6: "Bananas", 7: "Apples" },
+                5: { 0: "random_SelectFrom", 1: "4", 2: "Select something", 3: "Grapefruit", 4: "Oranges", 5: "Grapefruit", 6: "Bananas", 7: "Apples" },
                 "wmodel_class": { 0: "wmodel_class", 1: "0", 2: "company" }
             },
 
@@ -32532,13 +32532,21 @@ var DbObjectView = function (_React$Component) {
                     snapshot.forEach(function (childSnapshot) {
                         var newObject = {};
                         newObject["" + childSnapshot.key] = childSnapshot.val();
-                        dbObject.properties[0].push(newObject);
+                        console.log("PrePush " + dbObject.properties);
+                        dbObject.properties["" + childSnapshot.key] = childSnapshot.val();
+                        //dbObject.properties[0].push(newObject);
+                        console.log("PostPush");
                         //dbObject.properties["" + childSnapshot.key] = childSnapshot.val();
                         console.log("added property");
                     });
 
                     console.log(JSON.stringify(dbObject));
-                    _this2.setState({ displayObject: dbObject });
+                    _this2.setState({
+                        objectDescription: dbObject.description,
+                        objectUniqueId: dbObject.uniqueID,
+                        objectProperties: dbObject.properties
+                        //displayObject: dbObject 
+                    });
                     console.log("DisplayObject toString: " + JSON.stringify(_this2.state));
                 });
             });
@@ -32546,22 +32554,18 @@ var DbObjectView = function (_React$Component) {
     }, {
         key: "componentDidMount",
         value: function componentDidMount() {
-            //this.getFBObject();
+            this.getFBObject();
         }
     }, {
         key: "renderField",
         value: function renderField() {
             var count = Object.keys(this.state.objectProperties).length;
-            console.log("Count: " + count);
             var field = void 0;
             var fields = new Array();
             var counter = 1;
             while (counter < count) {
 
-                console.log("Start loop " + counter);
                 var property = this.state.objectProperties[counter];
-                console.log(JSON.stringify(property));
-                console.log("Value: " + property[this.FORM_FIELD_TYPE]);
                 switch (Number.parseInt(property[this.FORM_FIELD_TYPE])) {
 
                     case this.EXCLUDE:
@@ -32582,10 +32586,17 @@ var DbObjectView = function (_React$Component) {
                         );
                         break;
                     case this.FINALIZE_BUTTONS:
+                        var displaySubmit = void 0;
+                        var displaySave = void 0;
+                        var displayCancel = void 0;
+
                         field = _react2.default.createElement(
                             "div",
                             null,
-                            "FinalizeButtons"
+                            property[this.DISPLAY_TEXT],
+                            _react2.default.createElement("input", { type: "button", value: "Submit", style: { display: property[this.SUBMIT_BUTTON] == "true" ? '' : 'none' } }),
+                            _react2.default.createElement("input", { type: "button", value: "Save", style: { display: property[this.SAVE_BUTTON] == "true" ? '' : 'none' } }),
+                            _react2.default.createElement("input", { type: "button", value: "Cancel", style: { display: property[this.CANCEL_BUTTON] == "true" ? '' : 'none' } })
                         );
                         break;
                     case this.GEOSTOP:
@@ -32618,7 +32629,6 @@ var DbObjectView = function (_React$Component) {
                                     "Default Value"
                                 ),
                                 options.map(function (option) {
-                                    console.log(option);
                                     return _react2.default.createElement(
                                         "option",
                                         null,
@@ -32672,9 +32682,11 @@ var DbObjectView = function (_React$Component) {
             return _react2.default.createElement(
                 "div",
                 null,
-                " ",
-                fields,
-                " "
+                _react2.default.createElement(
+                    "form",
+                    null,
+                    fields
+                )
             );
         }
     }, {
@@ -32708,7 +32720,9 @@ exports.DbObjectView = DbObjectView;
 /*
 
 Next: 
-    1. Finish building formfields based on type
+   X1. Finish building formfields based on type
+    1.1 Separate Firebase functions into another component
+    1.2 Separate Presentation components from logic components
     2. Reconnect Firebase objects to UI
     3. Save values to state Object on Save or Submit
     4. Save DBObject to Firebase on Save or Submit
@@ -32720,18 +32734,6 @@ Next:
 
     When submit is clicked it cycles through all the divs and takes the values and puts them
     into the DBObject based on div ID then sends that object to Firebase.
-
-This works:
-render() {
-    let task;
-    if (!apocalypse) {
-      task = <div>Div 1</div>;
-    } else {
-      task = <div>Div 2</div>;
-    }
-
-    return task;
-  }
 */
 
 /***/ }),
