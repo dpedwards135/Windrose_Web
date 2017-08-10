@@ -48,6 +48,7 @@ class DbObjectView extends React.Component {
         this.getFBObject = this.getFBObject.bind(this);
         this.renderField = this.renderField.bind(this);
         this.updateValue = this.updateValue.bind(this);
+        this.saveFBObject = this.saveFBObject.bind(this);
     }
 
     getFBObject() {
@@ -60,29 +61,24 @@ class DbObjectView extends React.Component {
 
         console.log("GetFBObject");
         var objectPath = path("company", 3, "contract/");
-        console.log(objectPath);
         var database = firebase.database();
         var dbref = database.ref(objectPath);
         dbref.once('value').then((snapshot) => {
             dbObject.uniqueID = snapshot.val().uniqueID;
-            console.log(dbObject.uniqueID)
             dbObject.description = snapshot.val().description;
-            console.log(dbObject.description);
 
             dbref.child("properties").once('value', (snapshot) => {
                 snapshot.forEach((childSnapshot) => {
                     let newObject = {};
                     newObject["" + childSnapshot.key] = childSnapshot.val();
-                    console.log("PrePush " + dbObject.properties);
                     dbObject.properties["" + childSnapshot.key] = (childSnapshot.val());
                     //dbObject.properties[0].push(newObject);
-                    console.log("PostPush");
                     //dbObject.properties["" + childSnapshot.key] = childSnapshot.val();
-                    console.log("added property");
                 }
                 );
 
-                console.log(JSON.stringify(dbObject));
+
+
                 this.setState({
                     objectDescription: dbObject.description,
                     objectUniqueId: dbObject.uniqueID,
@@ -92,18 +88,49 @@ class DbObjectView extends React.Component {
         });
     }
 
+    saveFBObject(listType) {
+
+        let dbObject = {
+            uniqueID: "",
+            description: "",
+            properties: {}
+        };
+        var database = firebase.database();
+
+        dbObject.description = this.state.objectDescription;
+        dbObject.properties = this.state.objectProperties;
+
+        if (this.state.objectUniqueId === "contract") {
+            var newObjectPath = path((dbObject.properties["wmodel_class"][this.DISPLAY_TEXT]), listType, "");
+            var newObjectRef = database.ref(newObjectPath);
+            
+            var newPush = newObjectRef.push();
+            var newObjectId = newPush.key;
+            console.log(newObjectId);
+            dbObject.uniqueID = newObjectId;
+        } else {
+            dbObject.uniqueID = this.state.objectUniqueId;
+        }
+
+        console.log("SaveFBObject " + JSON.stringify(dbObject));
+        var objectPath = path(dbObject.properties["wmodel_class"][this.DISPLAY_TEXT], listType, dbObject.uniqueID);
+        var dbref = database.ref(objectPath);
+        dbref.set(dbObject);
+
+        console.log("3");
+    }
+
     componentDidMount() {
-        //this.getFBObject();
+        this.getFBObject();
     }
 
     updateValue(evt) {
         var val;
-        if(evt.target.type === "checkbox") {val = evt.target.checked} else {val = evt.target.value};
+        if (evt.target.type === "checkbox") { val = evt.target.checked } else { val = evt.target.value };
         var state = this.state;
         state.objectProperties[evt.target.name][this.SELECTED_VALUE] = val;
         this.setState(state);
-        console.log("New State: " + this.state.objectProperties[evt.target.name][this.SELECTED_VALUE]);
-            
+
     }
 
     renderField() {
@@ -144,7 +171,6 @@ class DbObjectView extends React.Component {
                         break;
                 }
                 fields.push(field);
-                console.log("Added Field");
                 counter++;
             } else {
 
@@ -169,7 +195,8 @@ class DbObjectView extends React.Component {
 
                         field = <div>
                             {property[this.DISPLAY_TEXT]}
-                            <input type="button" value="Submit" style={{ display: ((property[this.SUBMIT_BUTTON]) == "true") ? '' : 'none' }} />
+                            <input type="button" value="Submit" onClick={() => {this.saveFBObject(2)}} style={{ display: ((property[this.SUBMIT_BUTTON]) == "true") ? '' : 'none' }} 
+                                 />
                             <input type="button" value="Save" style={{ display: ((property[this.SAVE_BUTTON]) == "true") ? '' : 'none' }} />
                             <input type="button" value="Cancel" style={{ display: ((property[this.CANCEL_BUTTON]) == "true") ? '' : 'none' }} />
                         </div>;
@@ -225,7 +252,6 @@ class DbObjectView extends React.Component {
                         break;
                 }
                 fields.push(field);
-                console.log("Added Field");
                 counter++;
             }
         }
@@ -241,7 +267,6 @@ class DbObjectView extends React.Component {
 
 
     render() {
-        console.log("rendering dbObjectView");
         /*
             For Element in DBObject - get fieldType and add a cell based 
             on that fieldType
@@ -265,7 +290,7 @@ Next:
     1.1 Separate Firebase functions into another component
     1.2 Separate Presentation components from logic components
    X2. Reconnect Firebase objects to UI
-    3. Save values to state Object on Save or Submit
+   X3. Save values to state Object on Save or Submit
     4. Save DBObject to Firebase on Save or Submit
 
     What I want to do:
@@ -273,7 +298,7 @@ Next:
     Render each property differently depending on FormField type
     Function takes a list of objects and returns JSX div with ID
 
-    When submit is clicked it cycles through all the divs and takes the values and puts them
-    into the DBObject based on div ID then sends that object to Firebase.
+    When submit is clicked it creates a path based on ID (creates a new one if "contract")
+    and sends it up.
 */
 

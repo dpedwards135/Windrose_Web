@@ -32502,6 +32502,7 @@ var DbObjectView = function (_React$Component) {
         _this.getFBObject = _this.getFBObject.bind(_this);
         _this.renderField = _this.renderField.bind(_this);
         _this.updateValue = _this.updateValue.bind(_this);
+        _this.saveFBObject = _this.saveFBObject.bind(_this);
         return _this;
     }
 
@@ -32518,28 +32519,21 @@ var DbObjectView = function (_React$Component) {
 
             console.log("GetFBObject");
             var objectPath = (0, _FirebaseHelper.path)("company", 3, "contract/");
-            console.log(objectPath);
             var database = firebase.database();
             var dbref = database.ref(objectPath);
             dbref.once('value').then(function (snapshot) {
                 dbObject.uniqueID = snapshot.val().uniqueID;
-                console.log(dbObject.uniqueID);
                 dbObject.description = snapshot.val().description;
-                console.log(dbObject.description);
 
                 dbref.child("properties").once('value', function (snapshot) {
                     snapshot.forEach(function (childSnapshot) {
                         var newObject = {};
                         newObject["" + childSnapshot.key] = childSnapshot.val();
-                        console.log("PrePush " + dbObject.properties);
                         dbObject.properties["" + childSnapshot.key] = childSnapshot.val();
                         //dbObject.properties[0].push(newObject);
-                        console.log("PostPush");
                         //dbObject.properties["" + childSnapshot.key] = childSnapshot.val();
-                        console.log("added property");
                     });
 
-                    console.log(JSON.stringify(dbObject));
                     _this2.setState({
                         objectDescription: dbObject.description,
                         objectUniqueId: dbObject.uniqueID,
@@ -32549,9 +32543,42 @@ var DbObjectView = function (_React$Component) {
             });
         }
     }, {
+        key: "saveFBObject",
+        value: function saveFBObject(listType) {
+
+            var dbObject = {
+                uniqueID: "",
+                description: "",
+                properties: {}
+            };
+            var database = firebase.database();
+
+            dbObject.description = this.state.objectDescription;
+            dbObject.properties = this.state.objectProperties;
+
+            if (this.state.objectUniqueId === "contract") {
+                var newObjectPath = (0, _FirebaseHelper.path)(dbObject.properties["wmodel_class"][this.DISPLAY_TEXT], listType, "");
+                var newObjectRef = database.ref(newObjectPath);
+
+                var newPush = newObjectRef.push();
+                var newObjectId = newPush.key;
+                console.log(newObjectId);
+                dbObject.uniqueID = newObjectId;
+            } else {
+                dbObject.uniqueID = this.state.objectUniqueId;
+            }
+
+            console.log("SaveFBObject " + JSON.stringify(dbObject));
+            var objectPath = (0, _FirebaseHelper.path)(dbObject.properties["wmodel_class"][this.DISPLAY_TEXT], listType, dbObject.uniqueID);
+            var dbref = database.ref(objectPath);
+            dbref.set(dbObject);
+
+            console.log("3");
+        }
+    }, {
         key: "componentDidMount",
         value: function componentDidMount() {
-            //this.getFBObject();
+            this.getFBObject();
         }
     }, {
         key: "updateValue",
@@ -32565,11 +32592,12 @@ var DbObjectView = function (_React$Component) {
             var state = this.state;
             state.objectProperties[evt.target.name][this.SELECTED_VALUE] = val;
             this.setState(state);
-            console.log("New State: " + this.state.objectProperties[evt.target.name][this.SELECTED_VALUE]);
         }
     }, {
         key: "renderField",
         value: function renderField() {
+            var _this3 = this;
+
             var count = Object.keys(this.state.objectProperties).length;
             var field = void 0;
             var fields = new Array();
@@ -32625,7 +32653,6 @@ var DbObjectView = function (_React$Component) {
                             break;
                     }
                     fields.push(field);
-                    console.log("Added Field");
                     counter++;
                 } else {
 
@@ -32657,7 +32684,10 @@ var DbObjectView = function (_React$Component) {
                                 "div",
                                 null,
                                 property[this.DISPLAY_TEXT],
-                                _react2.default.createElement("input", { type: "button", value: "Submit", style: { display: property[this.SUBMIT_BUTTON] == "true" ? '' : 'none' } }),
+                                _react2.default.createElement("input", { type: "button", value: "Submit", onClick: function onClick() {
+                                        _this3.saveFBObject(2);
+                                    }, style: { display: property[this.SUBMIT_BUTTON] == "true" ? '' : 'none' }
+                                }),
                                 _react2.default.createElement("input", { type: "button", value: "Save", style: { display: property[this.SAVE_BUTTON] == "true" ? '' : 'none' } }),
                                 _react2.default.createElement("input", { type: "button", value: "Cancel", style: { display: property[this.CANCEL_BUTTON] == "true" ? '' : 'none' } })
                             );
@@ -32738,7 +32768,6 @@ var DbObjectView = function (_React$Component) {
                             break;
                     }
                     fields.push(field);
-                    console.log("Added Field");
                     counter++;
                 }
             }
@@ -32756,7 +32785,6 @@ var DbObjectView = function (_React$Component) {
     }, {
         key: "render",
         value: function render() {
-            console.log("rendering dbObjectView");
             /*
                 For Element in DBObject - get fieldType and add a cell based 
                 on that fieldType
@@ -32783,7 +32811,7 @@ Next:
     1.1 Separate Firebase functions into another component
     1.2 Separate Presentation components from logic components
    X2. Reconnect Firebase objects to UI
-    3. Save values to state Object on Save or Submit
+   X3. Save values to state Object on Save or Submit
     4. Save DBObject to Firebase on Save or Submit
 
     What I want to do:
@@ -32791,8 +32819,8 @@ Next:
     Render each property differently depending on FormField type
     Function takes a list of objects and returns JSX div with ID
 
-    When submit is clicked it cycles through all the divs and takes the values and puts them
-    into the DBObject based on div ID then sends that object to Firebase.
+    When submit is clicked it creates a path based on ID (creates a new one if "contract")
+    and sends it up.
 */
 
 /***/ }),
