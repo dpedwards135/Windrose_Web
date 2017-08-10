@@ -32501,6 +32501,7 @@ var DbObjectView = function (_React$Component) {
 
         _this.getFBObject = _this.getFBObject.bind(_this);
         _this.renderField = _this.renderField.bind(_this);
+        _this.updateValue = _this.updateValue.bind(_this);
         return _this;
     }
 
@@ -32550,7 +32551,21 @@ var DbObjectView = function (_React$Component) {
     }, {
         key: "componentDidMount",
         value: function componentDidMount() {
-            this.getFBObject();
+            //this.getFBObject();
+        }
+    }, {
+        key: "updateValue",
+        value: function updateValue(evt) {
+            var val;
+            if (evt.target.type === "checkbox") {
+                val = evt.target.checked;
+            } else {
+                val = evt.target.value;
+            };
+            var state = this.state;
+            state.objectProperties[evt.target.name][this.SELECTED_VALUE] = val;
+            this.setState(state);
+            console.log("New State: " + this.state.objectProperties[evt.target.name][this.SELECTED_VALUE]);
         }
     }, {
         key: "renderField",
@@ -32574,11 +32589,7 @@ var DbObjectView = function (_React$Component) {
                             );
                             break;
                         case this.FINALIZE_BUTTONS:
-                            field = _react2.default.createElement(
-                                "div",
-                                null,
-                                "Finalize Buttons"
-                            );
+                            field = _react2.default.createElement("div", null);
                             break;
                         case this.GEOSTOP:
                             field = _react2.default.createElement(
@@ -32633,7 +32644,7 @@ var DbObjectView = function (_React$Component) {
                                 null,
                                 property[this.DISPLAY_TEXT],
                                 _react2.default.createElement("br", null),
-                                _react2.default.createElement("input", { type: "checkbox", defaultChecked: property[this.SELECTED_VALUE] }),
+                                _react2.default.createElement("input", { type: "checkbox", name: counter, defaultChecked: property[this.SELECTED_VALUE], onChange: this.updateValue }),
                                 _react2.default.createElement("br", null)
                             );
                             break;
@@ -32674,7 +32685,7 @@ var DbObjectView = function (_React$Component) {
                                 _react2.default.createElement("br", null),
                                 _react2.default.createElement(
                                     "select",
-                                    { defaultValue: property[this.SELECTED_VALUE] },
+                                    { defaultValue: property[this.SELECTED_VALUE], name: counter, onChange: this.updateValue },
                                     _react2.default.createElement(
                                         "option",
                                         { value: "", disabled: true },
@@ -32698,7 +32709,7 @@ var DbObjectView = function (_React$Component) {
                                 null,
                                 property[this.DISPLAY_TEXT],
                                 _react2.default.createElement("br", null),
-                                _react2.default.createElement("input", { type: "text", placeholder: property[this.SELECTED_VALUE] }),
+                                _react2.default.createElement("input", { type: "text", name: counter, placeholder: property[this.SELECTED_VALUE], onChange: this.updateValue }),
                                 _react2.default.createElement("br", null),
                                 _react2.default.createElement("br", null)
                             );
@@ -32771,7 +32782,7 @@ Next:
    X1. Finish building formfields based on type
     1.1 Separate Firebase functions into another component
     1.2 Separate Presentation components from logic components
-    2. Reconnect Firebase objects to UI
+   X2. Reconnect Firebase objects to UI
     3. Save values to state Object on Save or Submit
     4. Save DBObject to Firebase on Save or Submit
 

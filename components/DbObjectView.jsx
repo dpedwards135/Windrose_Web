@@ -47,6 +47,7 @@ class DbObjectView extends React.Component {
 
         this.getFBObject = this.getFBObject.bind(this);
         this.renderField = this.renderField.bind(this);
+        this.updateValue = this.updateValue.bind(this);
     }
 
     getFBObject() {
@@ -92,7 +93,17 @@ class DbObjectView extends React.Component {
     }
 
     componentDidMount() {
-        this.getFBObject();
+        //this.getFBObject();
+    }
+
+    updateValue(evt) {
+        var val;
+        if(evt.target.type === "checkbox") {val = evt.target.checked} else {val = evt.target.value};
+        var state = this.state;
+        state.objectProperties[evt.target.name][this.SELECTED_VALUE] = val;
+        this.setState(state);
+        console.log("New State: " + this.state.objectProperties[evt.target.name][this.SELECTED_VALUE]);
+            
     }
 
     renderField() {
@@ -147,7 +158,7 @@ class DbObjectView extends React.Component {
                             <div>
                                 {property[this.DISPLAY_TEXT]}
                                 <br />
-                                <input type="checkbox" defaultChecked={property[this.SELECTED_VALUE]} />
+                                <input type="checkbox" name={counter} defaultChecked={property[this.SELECTED_VALUE]} onChange={this.updateValue} />
                                 <br />
                             </div>;
                         break;
@@ -178,7 +189,7 @@ class DbObjectView extends React.Component {
                         field = <div>
                             {property[this.DISPLAY_TEXT]}
                             <br />
-                            <select defaultValue={property[this.SELECTED_VALUE]} >
+                            <select defaultValue={property[this.SELECTED_VALUE]} name={counter} onChange={this.updateValue}>
                                 <option value="" disabled>Default Value</option>
                                 {
                                     options.map((option) => {
@@ -195,7 +206,7 @@ class DbObjectView extends React.Component {
                             <div>
                                 {property[this.DISPLAY_TEXT]}
                                 <br />
-                                <input type="text" placeholder={property[this.SELECTED_VALUE]} />
+                                <input type="text" name={counter} placeholder={property[this.SELECTED_VALUE]} onChange={this.updateValue} />
                                 <br />
                                 <br />
                             </div>;
@@ -253,7 +264,7 @@ Next:
    X1. Finish building formfields based on type
     1.1 Separate Firebase functions into another component
     1.2 Separate Presentation components from logic components
-    2. Reconnect Firebase objects to UI
+   X2. Reconnect Firebase objects to UI
     3. Save values to state Object on Save or Submit
     4. Save DBObject to Firebase on Save or Submit
 
