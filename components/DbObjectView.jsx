@@ -291,14 +291,11 @@ Next:
     1.2 Separate Presentation components from logic components
    X2. Reconnect Firebase objects to UI
    X3. Save values to state Object on Save or Submit
-    4. Save DBObject to Firebase on Save or Submit
+   X4. Save DBObject to Firebase on Save or Submit
 
-    What I want to do:
-    Take a list of properties
-    Render each property differently depending on FormField type
-    Function takes a list of objects and returns JSX div with ID
+    5. Load a list of objects as requested from FB into app
+    6. Pass unique ID to DbObjectView
 
-    When submit is clicked it creates a path based on ID (creates a new one if "contract")
-    and sends it up.
+    User story: User can select a type and "New" from app and create new object
 */
 

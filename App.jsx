@@ -1,5 +1,6 @@
 import React from "react";
 import * as firebase from "firebase";
+import { getModelClassList, saveModelClassItem } from "./components/FirebaseHelper";
 
 import { DbObjectView } from "./components/DbObjectView";
 
@@ -25,6 +26,7 @@ class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            classList: ["Avocados", "Tulips"],
             companyId: "",
             userEmail: "0",
             formType: 0,
@@ -33,37 +35,29 @@ class App extends React.Component {
             selectedItem: "1",
             selectedObject: {}
         };
-        this.changeTableType = this.changeTableType.bind(this);
+        this.openDbObject = this.openDbObject.bind(this);
         this.signIn = this.signIn.bind(this);
-        //this.getFBObject = this.getFBObject.bind(this);
+        this.getModelClassList = getModelClassList.bind(this);
+        this.saveModelClassItem = saveModelClassItem.bind(this);
     }
 
     signIn(userName) {
         console.log("Sign In: " + firebase.User.userName);
         this.setState({ userEmail: userName });
+        this.getModelClassList((list) => {
+            this.setState( { classList: list });
+        }
+        );
     }
 
-/*
-    getFBObject() {
-        console.log("GetFBObject");
-        var objectPath = path("company", 3, "contract/");
-        console.log(objectPath);
-        var database = firebase.database();
-        var dbref = database.ref(objectPath);
-        dbref.once('value').then(function(snapshot) {
-            var username = snapshot.val().description;
-            console.log("username: " + username);
-        });
-    }
-*/
 
-    changeTableType(formNumber, selectedObject) {
-        console.log("ChangeTableType " + selectedObject);
+    openDbObject(formNumber, selectedObject) {
+        console.log("openDbObject " + selectedObject);
         this.setState({
             formType: formNumber,
             selectedItem: selectedObject
         });
-        
+
         return;
     }
 
@@ -75,8 +69,8 @@ class App extends React.Component {
                 <td>{asset.type}</td>
                 <td>{asset.category}</td>
                 <td>
-                    <Button1 name="Edit" onClick={this.changeTableType} selectedObject={asset.id} />
-                    <Button1 name="View" onClick={this.changeTableType} selectedObject={asset.id} />
+                    <Button1 name="Edit" onClick={this.openDbObject} selectedObject={asset.id} />
+                    <Button1 name="View" onClick={this.openDbObject} selectedObject={asset.id} />
                 </td>
             </tr>
         ))
@@ -91,12 +85,18 @@ class App extends React.Component {
 
         }
         if (this.state.formType === 0) {
+            console.log("list" + JSON.stringify(this.state));
             return (
                 <div>
                     <Header name={this.state.userEmail} />
-                    <Selector onChange={this.changeTableType} />
+                    <Selector onChange={this.openDbObject} list={this.state.classList} />
+                    <form>
+                        <input type="text" id="newClassInput" />
+                        <input type="button" value="Add New Model Class" onClick={() =>
+                            this.saveModelClassItem(document.getElementById("newClassInput").value)} />
+                    </form>
                     <br />
-                    <Selector />
+                    <Button1 name="New" onClick={this.openDbObject} selectedObject="0" />
                     <table>
                         <thead>
                             <tr>
@@ -161,11 +161,13 @@ class Selector extends React.Component {
         const itemOrType = e.target.value;
         this.props.onChange(2);
     }
+
     render() {
         return (
             <select onChange={this.handleChange}>
-                <option>Types</option>
-                <option>Items</option>
+                {this.props.list.map((item, i) => {
+                console.log('test');
+                return <option>{item}</option>})}
             </select>
         );
     }
@@ -181,8 +183,10 @@ class Button1 extends React.Component {
         const itemOrType = e.target.value;
         if (this.props.name === "Edit") {
             this.props.onClick(2, this.props.selectedObject);
-        } else {
+        } else if (this.props.name === "View") {
             this.props.onClick(1, this.props.selectedObject);
+        } else {
+            this.props.onClick(2, "contract");
         }
     }
     render() {
